@@ -88,6 +88,10 @@ class ChatOpenAI_ChatModels implements INode {
                 type: 'options',
                 options: [
                     {
+                        label: 'None',
+                        name: 'none'
+                    },
+                    {
                         label: 'Low',
                         name: 'low'
                     },
