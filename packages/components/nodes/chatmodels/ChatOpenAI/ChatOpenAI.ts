@@ -235,6 +235,7 @@ class ChatOpenAI_ChatModels implements INode {
         const strictToolCalling = nodeData.inputs?.strictToolCalling as boolean
         const basePath = nodeData.inputs?.basepath as string
         const baseOptions = nodeData.inputs?.baseOptions
+        const reasoning = nodeData.inputs?.reasoning as boolean
         const reasoningEffort = nodeData.inputs?.reasoningEffort as OpenAIClient.ReasoningEffort | null
         const reasoningSummary = nodeData.inputs?.reasoningSummary as 'auto' | 'concise' | 'detailed' | null
         const allowImageUploads = nodeData.inputs?.allowImageUploads as boolean
@@ -270,14 +271,24 @@ class ChatOpenAI_ChatModels implements INode {
         if (isReasoningModelOpenAI(modelName)) {
             delete obj.temperature
             delete obj.stop
-            const reasoning: OpenAIClient.Reasoning = {}
-            if (reasoningEffort) {
-                reasoning.effort = reasoningEffort
+        
+            if (reasoning) {
+                const reasoningConfig: OpenAIClient.Reasoning = {}
+        
+                if (reasoningEffort) {
+                    reasoningConfig.effort = reasoningEffort
+                }
+        
+                if (reasoningSummary) {
+                    reasoningConfig.summary = reasoningSummary
+                }
+        
+                obj.reasoning = reasoningConfig
+            } else if (modelName.startsWith('gpt-5.6-')) {
+                obj.reasoning = {
+                    effort: 'none'
+                }
             }
-            if (reasoningSummary) {
-                reasoning.summary = reasoningSummary
-            }
-            obj.reasoning = reasoning
         }
 
         let parsedBaseOptions: any | undefined = undefined
